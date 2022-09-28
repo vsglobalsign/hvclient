@@ -20,6 +20,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -48,13 +49,14 @@ import (
 //
 // It is safe to make concurrent API calls from a single client object.
 type Client struct {
-	config     *Config
-	url        *url.URL
-	httpClient *http.Client
-	token      string
-	lastLogin  time.Time
-	tokenMtx   sync.RWMutex
-	loginMtx   sync.Mutex
+	BaseURL    *url.URL
+	HTTPClient *http.Client
+
+	config    *Config
+	token     string
+	lastLogin time.Time
+	tokenMtx  sync.RWMutex
+	loginMtx  sync.Mutex
 }
 
 const (
@@ -91,7 +93,7 @@ func (c *Client) makeRequest(
 			body = bytes.NewReader(data)
 		}
 
-		var request, err = http.NewRequestWithContext(ctx, method, c.url.String()+path, body)
+		var request, err = http.NewRequestWithContext(ctx, method, c.BaseURL.String()+path, body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create new HTTP request: %w", err)
 		}
@@ -119,11 +121,11 @@ func (c *Client) makeRequest(
 			}
 
 			// Add the authentication token to all requests except login requests.
-			request.Header.Set(httputils.AuthorizationHeader, "Bearer "+c.tokenRead())
+			request.Header.Set(httputils.AuthorizationHeader, "Bearer "+c.GetToken())
 		}
 
 		// Execute the request.
-		if response, err = c.httpClient.Do(request); err != nil {
+		if response, err = c.HTTPClient.Do(request); err != nil {
 			return nil, fmt.Errorf("failed to execute HTTP request: %w", err)
 		}
 		defer httputils.ConsumeAndCloseResponseBody(response)
@@ -220,6 +222,46 @@ func (c *Client) DefaultTimeout() time.Duration {
 	return c.config.Timeout
 }
 
+// New Thin Client creates a new client with no initial login client and a custom
+// http client to facilitate re-use between hvclients.
+func NewThinClient(profile *clientProfile, httpClient *http.Client) (*Client, error) {
+
+	var newClient Client
+	token := profile.token
+	conf := profile.config
+
+	// Use API Key and Secret to retrieve HV Token
+	if &conf.APISecret != nil {
+		err := conf.Validate()
+		if err != nil {
+			return nil, err
+		}
+
+		// Build a new client.
+		newClient = Client{
+			config:     conf,
+			BaseURL:    conf.url,
+			HTTPClient: httpClient,
+		}
+	} else {
+		// Use API Key and Token to retrieve HV Token
+		if len(token) != 0 {
+			err := errors.New("Invalid/Empty Token")
+			return nil, err
+		}
+
+		// Build a new client.
+		newClient = Client{
+			config:     conf,
+			token:      token,
+			BaseURL:    conf.url,
+			HTTPClient: httpClient,
+		}
+	}
+
+	return &newClient, nil
+}
+
 // NewClient creates a new HVCA client from a configuration object. An initial
 // login is made, and the returned client is immediately ready to make API
 // calls.
@@ -245,7 +287,7 @@ func NewClient(ctx context.Context, conf *Config) (*Client, error) {
 		var tlsCerts []tls.Certificate
 		if conf.TLSCert != nil {
 			tlsCerts = []tls.Certificate{
-				tls.Certificate{
+				{
 					Certificate: [][]byte{conf.TLSCert.Raw},
 					PrivateKey:  conf.TLSKey,
 					Leaf:        conf.TLSCert,
@@ -263,8 +305,8 @@ func NewClient(ctx context.Context, conf *Config) (*Client, error) {
 	// Build a new client.
 	var newClient = Client{
 		config:     conf,
-		url:        conf.url,
-		httpClient: &http.Client{Transport: tnspt},
+		BaseURL:    conf.url,
+		HTTPClient: &http.Client{Transport: tnspt},
 	}
 
 	// Perform the initial login and return the new client.
