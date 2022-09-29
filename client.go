@@ -57,6 +57,8 @@ type Client struct {
 	lastLogin time.Time
 	tokenMtx  sync.RWMutex
 	loginMtx  sync.Mutex
+
+	ClientProfile *ClientProfile
 }
 
 const (
