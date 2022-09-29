@@ -136,7 +136,7 @@ func (c *Client) makeRequest(
 		// of the 2XX range as an error. Also treat 202 status codes as "errors",
 		// because we want to retry in that event.
 		if response.StatusCode < 200 || response.StatusCode > 299 || response.StatusCode == http.StatusAccepted {
-			var apiErr = newAPIError(response)
+			var apiErr = NewAPIError(response)
 
 			// Depending on the status code, we may want to retry the request.
 			switch apiErr.StatusCode {

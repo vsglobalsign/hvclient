@@ -105,7 +105,7 @@ func TestAPIError(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			var got = newAPIError(tc.in)
+			var got = NewAPIError(tc.in)
 			if !cmp.Equal(got, tc.want) {
 				t.Fatalf("got %v, want %v", got, tc.want)
 			}
