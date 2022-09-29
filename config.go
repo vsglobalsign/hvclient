@@ -82,12 +82,12 @@ type Config struct {
 
 // Client Profile is a configuration object for HVCA client and contains
 // a Config field and a token field
-type clientProfile struct {
+type ClientProfile struct {
 	// Configuration
-	config *Config
+	Config *Config
 
 	// User Token
-	token string
+	Token string
 }
 
 const (

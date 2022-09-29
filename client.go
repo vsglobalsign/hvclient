@@ -224,11 +224,11 @@ func (c *Client) DefaultTimeout() time.Duration {
 
 // New Thin Client creates a new client with no initial login client and a custom
 // http client to facilitate re-use between hvclients.
-func NewThinClient(profile *clientProfile, httpClient *http.Client) (*Client, error) {
+func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, error) {
 
 	var newClient Client
-	token := profile.token
-	conf := profile.config
+	token := profile.Token
+	conf := profile.Config
 
 	// Use API Key and Secret to retrieve HV Token
 	if &conf.APISecret != nil {
