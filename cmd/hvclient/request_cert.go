@@ -22,8 +22,8 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/globalsign/hvclient"
-	"github.com/globalsign/hvclient/internal/pki"
+	"github.com/vsglobalsign/hvclient"
+	"github.com/vsglobalsign/hvclient/internal/pki"
 )
 
 // requestCert requests a new certificate from HVCA and retrieves and outputs

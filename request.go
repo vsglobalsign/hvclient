@@ -34,8 +34,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/globalsign/hvclient/internal/oids"
-	"github.com/globalsign/hvclient/internal/pki"
+	"github.com/vsglobalsign/hvclient/internal/oids"
+	"github.com/vsglobalsign/hvclient/internal/pki"
 )
 
 // Request is a request to HVCA for the issuance of a new certificate.

@@ -21,7 +21,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/globalsign/hvclient/internal/httputils"
+	"github.com/vsglobalsign/hvclient/internal/httputils"
 )
 
 // APIError is an error returned by the HVCA HTTP API.
