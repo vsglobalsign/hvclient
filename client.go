@@ -49,15 +49,13 @@ import (
 //
 // It is safe to make concurrent API calls from a single client object.
 type Client struct {
-	BaseURL    *url.URL
-	HTTPClient *http.Client
-
-	config    *Config
-	token     string
-	lastLogin time.Time
-	tokenMtx  sync.RWMutex
-	loginMtx  sync.Mutex
-
+	BaseURL       *url.URL
+	HTTPClient    *http.Client
+	Config        *Config
+	Token         string
+	LastLogin     time.Time
+	TokenMtx      sync.RWMutex
+	LoginMtx      sync.Mutex
 	ClientProfile *ClientProfile
 }
 
@@ -109,7 +107,7 @@ func (c *Client) makeRequest(
 
 		// Add any extra headers to the request first, so they can't override
 		// any headers we add ourselves.
-		for key, value := range c.config.ExtraHeaders {
+		for key, value := range c.Config.ExtraHeaders {
 			request.Header.Add(key, value)
 		}
 
@@ -221,7 +219,7 @@ func (c *Client) makeRequest(
 // configuration when creating the context to pass to an API method if the
 // original configuration information is no longer available.
 func (c *Client) DefaultTimeout() time.Duration {
-	return c.config.Timeout
+	return c.Config.Timeout
 }
 
 // New Thin Client creates a new client with no initial login client and a custom
@@ -241,7 +239,7 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 
 		// Build a new client.
 		newClient = Client{
-			config:     conf,
+			Config:     conf,
 			BaseURL:    conf.url,
 			HTTPClient: httpClient,
 		}
@@ -254,8 +252,8 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 
 		// Build a new client.
 		newClient = Client{
-			config:     conf,
-			token:      token,
+			Config:     conf,
+			Token:      token,
 			BaseURL:    conf.url,
 			HTTPClient: httpClient,
 		}
@@ -306,7 +304,7 @@ func NewClient(ctx context.Context, conf *Config) (*Client, error) {
 
 	// Build a new client.
 	var newClient = Client{
-		config:     conf,
+		Config:     conf,
 		BaseURL:    conf.url,
 		HTTPClient: &http.Client{Transport: tnspt},
 	}
