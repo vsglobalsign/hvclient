@@ -20,7 +20,8 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
+
+	// "errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -245,10 +246,10 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 	// 	}
 	// } else {
 	// Use API Key and Token to retrieve HV Token
-	if len(token) != 0 {
-		err := errors.New("Invalid/Empty Token")
-		return nil, err
-	}
+	// if len(token) != 0 {
+	// 	err := errors.New("Invalid/Empty Token")
+	// 	return nil, err
+	// }
 
 	// Build a new client.
 	newClient = Client{
