@@ -237,6 +237,8 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 		Proxy:               http.ProxyFromEnvironment,
 	}
 
+	profile.Config.url, _ = url.Parse(profile.Config.URL)
+
 	if profile.Config.url.Scheme == "https" {
 		// Populate TLS client certificates only if one was provided.
 		var tlsCerts []tls.Certificate
@@ -256,8 +258,6 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 			InsecureSkipVerify: profile.Config.InsecureSkipVerify,
 		}
 	}
-
-	profile.Config.url, _ = url.Parse(profile.Config.URL)
 
 	// Build a new client.
 	var newClient = Client{
