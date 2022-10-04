@@ -227,40 +227,42 @@ func (c *Client) DefaultTimeout() time.Duration {
 // http client to facilitate re-use between hvclients.
 func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, error) {
 
-	var newClient Client
-	token := profile.Token
-	conf := profile.Config
+	// Build an HTTP transport using any proxy settings from the environment.
+	// Experimentation suggests that the other values seem to reasonably
+	// maximally encourage the sharing of TCP connections.
+	var tnspt = &http.Transport{
+		MaxIdleConnsPerHost: 1024,
+		MaxIdleConns:        1024,
+		MaxConnsPerHost:     1024,
+		Proxy:               http.ProxyFromEnvironment,
+	}
 
-	fmt.Println("\nToken inside NewThinClient is ", token, "\nAPI Key inside NewThinClient is ", conf.APIKey)
+	if profile.Config.url.Scheme == "https" {
+		// Populate TLS client certificates only if one was provided.
+		var tlsCerts []tls.Certificate
+		if profile.Config.TLSCert != nil {
+			tlsCerts = []tls.Certificate{
+				{
+					Certificate: [][]byte{profile.Config.TLSCert.Raw},
+					PrivateKey:  profile.Config.TLSKey,
+					Leaf:        profile.Config.TLSCert,
+				},
+			}
+		}
 
-	fmt.Println("\nClient Profile address inside NewThinClient is ", &profile, "\nHTTP Client address inside NewThinClient is ", &httpClient)
-
-	// // Use API Key and Secret to retrieve HV Token
-	// if &conf.APISecret != nil {
-	// 	err := conf.Validate()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-
-	// 	// Build a new client.
-	// 	newClient = Client{
-	// 		Config:     conf,
-	// 		BaseURL:    conf.url,
-	// 		HTTPClient: httpClient,
-	// 	}
-	// } else {
-	// Use API Key and Token to retrieve HV Token
-	// if len(token) != 0 {
-	// 	err := errors.New("Invalid/Empty Token")
-	// 	return nil, err
-	// }
+		tnspt.TLSClientConfig = &tls.Config{
+			RootCAs:            profile.Config.TLSRoots,
+			Certificates:       tlsCerts,
+			InsecureSkipVerify: profile.Config.InsecureSkipVerify,
+		}
+	}
 
 	// Build a new client.
-	newClient = Client{
-		Config:        conf,
-		Token:         token,
-		BaseURL:       conf.url,
-		HTTPClient:    httpClient,
+	var newClient = Client{
+		Config:        profile.Config,
+		Token:         profile.Token,
+		BaseURL:       profile.Config.url,
+		HTTPClient:    &http.Client{Transport: tnspt},
 		ClientProfile: profile,
 		// }
 	}
