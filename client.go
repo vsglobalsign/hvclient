@@ -257,6 +257,8 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 		}
 	}
 
+	profile.Config.url, _ = url.Parse(profile.Config.URL)
+
 	// Build a new client.
 	var newClient = Client{
 		Config:        profile.Config,
