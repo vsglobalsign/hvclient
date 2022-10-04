@@ -257,10 +257,11 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 
 	// Build a new client.
 	newClient = Client{
-		Config:     conf,
-		Token:      token,
-		BaseURL:    conf.url,
-		HTTPClient: httpClient,
+		Config:        conf,
+		Token:         token,
+		BaseURL:       conf.url,
+		HTTPClient:    httpClient,
+		ClientProfile: profile,
 		// }
 	}
 
