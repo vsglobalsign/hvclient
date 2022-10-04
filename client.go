@@ -231,7 +231,7 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 	token := profile.Token
 	conf := profile.Config
 
-	fmt.Println("\nToken is ", token, "\nAPI Key is ", conf.APIKey)
+	fmt.Println("\nToken inside NewThinClient is ", token, "\nAPI Key inside NewThinClient is ", conf.APIKey)
 
 	// // Use API Key and Secret to retrieve HV Token
 	// if &conf.APISecret != nil {
