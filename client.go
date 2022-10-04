@@ -230,33 +230,33 @@ func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, er
 	token := profile.Token
 	conf := profile.Config
 
-	// Use API Key and Secret to retrieve HV Token
-	if &conf.APISecret != nil {
-		err := conf.Validate()
-		if err != nil {
-			return nil, err
-		}
+	// // Use API Key and Secret to retrieve HV Token
+	// if &conf.APISecret != nil {
+	// 	err := conf.Validate()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
 
-		// Build a new client.
-		newClient = Client{
-			Config:     conf,
-			BaseURL:    conf.url,
-			HTTPClient: httpClient,
-		}
-	} else {
-		// Use API Key and Token to retrieve HV Token
-		if len(token) != 0 {
-			err := errors.New("Invalid/Empty Token")
-			return nil, err
-		}
+	// 	// Build a new client.
+	// 	newClient = Client{
+	// 		Config:     conf,
+	// 		BaseURL:    conf.url,
+	// 		HTTPClient: httpClient,
+	// 	}
+	// } else {
+	// Use API Key and Token to retrieve HV Token
+	if len(token) != 0 {
+		err := errors.New("Invalid/Empty Token")
+		return nil, err
+	}
 
-		// Build a new client.
-		newClient = Client{
-			Config:     conf,
-			Token:      token,
-			BaseURL:    conf.url,
-			HTTPClient: httpClient,
-		}
+	// Build a new client.
+	newClient = Client{
+		Config:     conf,
+		Token:      token,
+		BaseURL:    conf.url,
+		HTTPClient: httpClient,
+		// }
 	}
 
 	return &newClient, nil
