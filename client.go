@@ -223,7 +223,7 @@ func (c *Client) DefaultTimeout() time.Duration {
 	return c.Config.Timeout
 }
 
-// New Thin Client creates a new client with no initial login client and a custom
+// NewThinClient creates a new client with no initial login client and a custom
 // http client to facilitate re-use between hvclients.
 func NewThinClient(profile *ClientProfile, httpClient *http.Client) (*Client, error) {
 

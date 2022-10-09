@@ -80,7 +80,7 @@ type Config struct {
 	Timeout time.Duration
 }
 
-// Client Profile is a configuration object for HVCA client and contains
+// ClientProfile is a configuration object for HVCA client and contains
 // a Config field and a token field
 type ClientProfile struct {
 	// Configuration
