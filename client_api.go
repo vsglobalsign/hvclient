@@ -381,11 +381,15 @@ func (c *Client) ClaimsDomains(
 	status ClaimStatus,
 ) ([]Claim, int64, error) {
 	var claims []Claim
+	var queryParams string
+	if status != -1 {
+		queryParams = paginationString(page, perPage, time.Time{}, time.Time{}) + fmt.Sprintf("&status=%s", status)
+	} else {
+		queryParams = paginationString(page, perPage, time.Time{}, time.Time{})
+	}
 	var r, err = c.makeRequest(
 		ctx,
-		endpointClaimsDomains+
-			paginationString(page, perPage, time.Time{}, time.Time{})+
-			fmt.Sprintf("&status=%s", status),
+		endpointClaimsDomains+queryParams,
 		http.MethodGet,
 		nil,
 		&claims,
