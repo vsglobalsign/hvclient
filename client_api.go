@@ -586,6 +586,7 @@ func (c *Client) claimAssert(ctx context.Context, body interface{}, id, path str
 // ClaimADNRetrieve retrieves a list of ADNs allowed for given domain
 func (c *Client) ClaimADNRetrieve(ctx context.Context, id string) (*ADNResults, error) {
 	var adns ADNResults
+	fmt.Println("\n Entered ClaimADNRetrieve in HV Client")
 	var response, err = c.makeRequest(
 		ctx,
 		endpointClaimsDomains+"/"+url.QueryEscape(id)+pathDNS,
@@ -593,6 +594,7 @@ func (c *Client) ClaimADNRetrieve(ctx context.Context, id string) (*ADNResults, 
 		nil,
 		&adns,
 	)
+	fmt.Println("\n Response is ", response.Body)
 	if err != nil {
 		return nil, err
 	}
