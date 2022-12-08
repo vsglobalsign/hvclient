@@ -72,11 +72,6 @@ type SOAResults struct {
 // revoked when requesting revocation.
 type RevocationReason string
 
-// SOAResults is a map of SOA records for DNS results
-type ADNResults struct {
-	ADNs []string `json:""`
-}
-
 // Revocation reasons to provide when revoking a certificate and providing a
 // reason for its revocation.
 const (
@@ -584,8 +579,8 @@ func (c *Client) claimAssert(ctx context.Context, body interface{}, id, path str
 }
 
 // ClaimADNRetrieve retrieves a list of ADNs allowed for given domain
-func (c *Client) ClaimADNRetrieve(ctx context.Context, id string) (*ADNResults, error) {
-	var adns ADNResults
+func (c *Client) ClaimADNRetrieve(ctx context.Context, id string) ([]string, error) {
+	var adns []string
 	fmt.Println("\n Entered ClaimADNRetrieve in HV Client")
 	fmt.Println("URL is ", endpointClaimsDomains+"/"+url.QueryEscape(id)+pathDNS)
 	var response, err = c.makeRequest(
@@ -595,14 +590,14 @@ func (c *Client) ClaimADNRetrieve(ctx context.Context, id string) (*ADNResults, 
 		nil,
 		&adns,
 	)
-	fmt.Println("\n Response is ", adns.ADNs)
+	fmt.Println("\n Response is ", adns)
 	if err != nil {
 		return nil, err
 	}
 
 	switch response.StatusCode {
 	case http.StatusOK:
-		return &adns, nil
+		return adns, nil
 	}
 
 	return nil, fmt.Errorf("unexpected status code: %d", response.StatusCode)
