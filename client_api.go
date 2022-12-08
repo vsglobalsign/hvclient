@@ -587,6 +587,7 @@ func (c *Client) claimAssert(ctx context.Context, body interface{}, id, path str
 func (c *Client) ClaimADNRetrieve(ctx context.Context, id string) (*ADNResults, error) {
 	var adns ADNResults
 	fmt.Println("\n Entered ClaimADNRetrieve in HV Client")
+	fmt.Println("URL is ", endpointClaimsDomains+"/"+url.QueryEscape(id)+pathDNS)
 	var response, err = c.makeRequest(
 		ctx,
 		endpointClaimsDomains+"/"+url.QueryEscape(id)+pathDNS,
