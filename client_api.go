@@ -595,7 +595,7 @@ func (c *Client) ClaimADNRetrieve(ctx context.Context, id string) (*ADNResults, 
 		nil,
 		&adns,
 	)
-	fmt.Println("\n Response is ", &adns.ADNs)
+	fmt.Println("\n Response is ", adns.ADNs)
 	if err != nil {
 		return nil, err
 	}
