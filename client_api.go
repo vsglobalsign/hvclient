@@ -74,7 +74,7 @@ type RevocationReason string
 
 // SOAResults is a map of SOA records for DNS results
 type ADNResults struct {
-	ADNs []string
+	ADNs []string `json:""`
 }
 
 // Revocation reasons to provide when revoking a certificate and providing a
