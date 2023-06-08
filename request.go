@@ -69,9 +69,9 @@ type Request struct {
 	MSExtension         *MSExtension
 	CustomExtensions    []OIDAndString
 	CSR                 *x509.CertificateRequest
+	SignaturePolicy     *SignaturePolicy
 	PrivateKey          interface{}
 	PublicKey           interface{}
-	PublicKeySignature  string
 }
 
 // Validity contains the requested not-before and not-after times for a
@@ -165,6 +165,7 @@ type jsonRequest struct {
 	QualifiedStatements *QualifiedStatements `json:"qualified_statements,omitempty"`
 	MSExtension         *MSExtension         `json:"ms_extension_template,omitempty"`
 	CustomExtensions    json.RawMessage      `json:"custom_extensions,omitempty"`
+	SignaturePolicy     *SignaturePolicy     `json:"signature,omitempty"`
 	PublicKey           string               `json:"public_key,omitempty"`
 	PublicKeySignature  string               `json:"public_key_signature,omitempty"`
 }
@@ -368,7 +369,6 @@ func (r Request) MarshalJSON() ([]byte, error) {
 
 	case r.CSR != nil:
 		publicKey = pki.CSRToPEMString(r.CSR)
-		publicKeySig = r.PublicKeySignature
 
 		// Remove trailing newline from string, if present.
 		if publicKey[len(publicKey)-1] == '\n' {
@@ -386,6 +386,7 @@ func (r Request) MarshalJSON() ([]byte, error) {
 		QualifiedStatements: r.QualifiedStatements,
 		MSExtension:         r.MSExtension,
 		CustomExtensions:    raw,
+		SignaturePolicy:     r.SignaturePolicy,
 		PublicKey:           publicKey,
 		PublicKeySignature:  publicKeySig,
 	})
@@ -450,6 +451,7 @@ func (r *Request) UnmarshalJSON(b []byte) error {
 		QualifiedStatements: jsonreq.QualifiedStatements,
 		MSExtension:         jsonreq.MSExtension,
 		CustomExtensions:    exts,
+		SignaturePolicy:     jsonreq.SignaturePolicy,
 	}
 
 	return nil
