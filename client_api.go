@@ -123,6 +123,9 @@ func (c *Client) CertificateRequest(
 	ctx context.Context,
 	req *Request,
 ) (*big.Int, error) {
+
+	fmt.Println("Request is ", req)
+
 	var r, err = c.makeRequest(
 		ctx,
 		endpointCertificates,
