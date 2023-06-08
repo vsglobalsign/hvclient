@@ -71,6 +71,7 @@ type Request struct {
 	CSR                 *x509.CertificateRequest
 	PrivateKey          interface{}
 	PublicKey           interface{}
+	PublicKeySignature  string
 }
 
 // Validity contains the requested not-before and not-after times for a
@@ -367,6 +368,7 @@ func (r Request) MarshalJSON() ([]byte, error) {
 
 	case r.CSR != nil:
 		publicKey = pki.CSRToPEMString(r.CSR)
+		publicKeySig = r.PublicKeySignature
 
 		// Remove trailing newline from string, if present.
 		if publicKey[len(publicKey)-1] == '\n' {
