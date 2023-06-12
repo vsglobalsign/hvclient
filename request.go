@@ -458,6 +458,7 @@ func (r *Request) UnmarshalJSON(b []byte) error {
 		MSExtension:         jsonreq.MSExtension,
 		CustomExtensions:    exts,
 		Signature:           jsonreq.Signature,
+		PublicKey:           jsonreq.PublicKey,
 	}
 
 	return nil
