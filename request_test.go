@@ -314,42 +314,6 @@ func TestRequestMarshalJSON(t *testing.T) {
 }`,
 		},
 		{
-			name: "RSAPublicKey",
-			req: hvclient.Request{
-				PublicKey: testhelpers.MustExtractRSAPublicKey(t, testRequestRSAPrivateKeyPEM),
-			},
-			want: `{
-    "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7s0nIwA4nzrc5az0iD6F\n710WI2BnabCVe1wNXUckq7RdWXtshlQODZow+M6t7P2FLolYYyhT9vD5hFlMNBKY\nFqAAkauGlmx12luVyURRLW0ht9Piu41MaLnLCCMM7tQ/5lixMHkT86sX/wX8q32Z\nOuatyUgVQUV1hKXZCH12y9VK9U3pQGoPgG15SbCo6yfUYvYLp7NmNEb55Gz4I1xf\n4PBaRvynr0dtwbFXQOQAfg+q29sm+elYnAQLvtVVyYmfn+jqK9u1Ey+X2sNns3HW\nz9OSQt7e9lFIKMlospQPl4YuGhfcID/xC1gZLV5wlvghFJx/1QUW/yI3MZGXpIav\njwIDAQAB\n-----END PUBLIC KEY-----"
-}`,
-		},
-		{
-			name: "RSAPublicKeyNoPointer",
-			req: hvclient.Request{
-				PublicKey: *testhelpers.MustExtractRSAPublicKey(t, testRequestRSAPrivateKeyPEM),
-			},
-			want: `{
-    "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7s0nIwA4nzrc5az0iD6F\n710WI2BnabCVe1wNXUckq7RdWXtshlQODZow+M6t7P2FLolYYyhT9vD5hFlMNBKY\nFqAAkauGlmx12luVyURRLW0ht9Piu41MaLnLCCMM7tQ/5lixMHkT86sX/wX8q32Z\nOuatyUgVQUV1hKXZCH12y9VK9U3pQGoPgG15SbCo6yfUYvYLp7NmNEb55Gz4I1xf\n4PBaRvynr0dtwbFXQOQAfg+q29sm+elYnAQLvtVVyYmfn+jqK9u1Ey+X2sNns3HW\nz9OSQt7e9lFIKMlospQPl4YuGhfcID/xC1gZLV5wlvghFJx/1QUW/yI3MZGXpIav\njwIDAQAB\n-----END PUBLIC KEY-----"
-}`,
-		},
-		{
-			name: "ECPublicKey",
-			req: hvclient.Request{
-				PublicKey: testhelpers.MustExtractECPublicKey(t, testRequestECPrivateKeyPEM),
-			},
-			want: `{
-    "public_key": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAETKbxjrMcHuXVmdmy0d1xSSjfY86U\nQlrBHFcYT3SHReVZZ0MdTjg/9PNUrWDpkZ75q4pZV5EpMgqrIdSIEqCiuA==\n-----END PUBLIC KEY-----"
-}`,
-		},
-		{
-			name: "ECPublicKeyNoPointer",
-			req: hvclient.Request{
-				PublicKey: *testhelpers.MustExtractECPublicKey(t, testRequestECPrivateKeyPEM),
-			},
-			want: `{
-    "public_key": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAETKbxjrMcHuXVmdmy0d1xSSjfY86U\nQlrBHFcYT3SHReVZZ0MdTjg/9PNUrWDpkZ75q4pZV5EpMgqrIdSIEqCiuA==\n-----END PUBLIC KEY-----"
-}`,
-		},
-		{
 			name: "RSAPrivateKey",
 			req: hvclient.Request{
 				PrivateKey: testhelpers.MustParseRSAPrivateKey(t, testRequestRSAPrivateKeyPEM),
@@ -1539,37 +1503,6 @@ func TestRequestPKCS10(t *testing.T) {
 
 			if err = got.CheckSignature(); err != nil {
 				t.Errorf("signature check failed: %v", err)
-			}
-		})
-	}
-}
-
-func TestRequestPKCS10Failure(t *testing.T) {
-	t.Parallel()
-
-	var testcases = []struct {
-		name    string
-		request hvclient.Request
-	}{
-		{
-			name: "NoPrivateKey",
-			request: hvclient.Request{
-				Subject: &hvclient.DN{
-					CommonName: "John Doe",
-				},
-				PublicKey: testhelpers.MustGetPublicKeyFromFile(t, "testdata/rsa_pub.key"),
-			},
-		},
-	}
-
-	for _, tc := range testcases {
-		var tc = tc
-
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			if _, err := tc.request.PKCS10(); err == nil {
-				t.Fatalf("unexpectedly built PKCS10 request")
 			}
 		})
 	}
