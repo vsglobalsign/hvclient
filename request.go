@@ -16,19 +16,13 @@ limitations under the License.
 package hvclient
 
 import (
-	"crypto"
-	"crypto/ecdsa"
 	"crypto/rand"
-	"crypto/rsa"
-	"crypto/sha256"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/big"
 	"net"
 	"net/url"
 	"sort"
@@ -71,7 +65,8 @@ type Request struct {
 	CSR                 *x509.CertificateRequest
 	Signature           *Signature
 	PrivateKey          interface{}
-	PublicKey           interface{}
+	// PublicKey           interface{}
+	PublicKey string
 }
 
 // Validity contains the requested not-before and not-after times for a
@@ -299,89 +294,89 @@ func (r Request) MarshalJSON() ([]byte, error) {
 	}
 
 	// Convert PKCS#10 certificate request, if present.
-	var publicKey string
-	var publicKeySig string
-	var err error
+	// var publicKey string
+	// var publicKeySig string
+	// var err error
 
-	switch {
-	case r.PublicKey != nil:
-		switch k := r.PublicKey.(type) {
-		case rsa.PublicKey:
-			if _, publicKey, err = publicKeyBytesAndString(&k); err != nil {
-				return nil, err
-			}
-		case *rsa.PublicKey:
-			if _, publicKey, err = publicKeyBytesAndString(k); err != nil {
-				return nil, err
-			}
-		case ecdsa.PublicKey:
-			if _, publicKey, err = publicKeyBytesAndString(&k); err != nil {
-				return nil, err
-			}
-		case *ecdsa.PublicKey:
-			if _, publicKey, err = publicKeyBytesAndString(k); err != nil {
-				return nil, err
-			}
-		default:
-			if _, publicKey, err = publicKeyBytesAndString(k); err != nil {
-				return nil, err
-			}
-		}
+	// switch {
+	// case r.PublicKey != nil:
+	// 	switch k := r.PublicKey.(type) {
+	// 	case rsa.PublicKey:
+	// 		if _, publicKey, err = publicKeyBytesAndString(&k); err != nil {
+	// 			return nil, err
+	// 		}
+	// 	case *rsa.PublicKey:
+	// 		if _, publicKey, err = publicKeyBytesAndString(k); err != nil {
+	// 			return nil, err
+	// 		}
+	// 	case ecdsa.PublicKey:
+	// 		if _, publicKey, err = publicKeyBytesAndString(&k); err != nil {
+	// 			return nil, err
+	// 		}
+	// 	case *ecdsa.PublicKey:
+	// 		if _, publicKey, err = publicKeyBytesAndString(k); err != nil {
+	// 			return nil, err
+	// 		}
+	// 	default:
+	// 		if _, publicKey, err = publicKeyBytesAndString(k); err != nil {
+	// 			return nil, err
+	// 		}
+	// 	}
 
-	case r.PrivateKey != nil:
-		switch k := r.PrivateKey.(type) {
-		case *rsa.PrivateKey:
-			var pubKeyBytes []byte
-			var err error
+	// case r.PrivateKey != nil:
+	// 	switch k := r.PrivateKey.(type) {
+	// 	case *rsa.PrivateKey:
+	// 		var pubKeyBytes []byte
+	// 		var err error
 
-			if pubKeyBytes, publicKey, err = publicKeyBytesAndString(&k.PublicKey); err != nil {
-				return nil, err
-			}
+	// 		if pubKeyBytes, publicKey, err = publicKeyBytesAndString(&k.PublicKey); err != nil {
+	// 			return nil, err
+	// 		}
 
-			var h = sha256.Sum256(pubKeyBytes)
+	// 		var h = sha256.Sum256(pubKeyBytes)
 
-			var signedBytes []byte
-			if signedBytes, err = rsa.SignPKCS1v15(rand.Reader, k, crypto.SHA256, h[:]); err != nil {
-				return nil, err
-			}
+	// 		var signedBytes []byte
+	// 		if signedBytes, err = rsa.SignPKCS1v15(rand.Reader, k, crypto.SHA256, h[:]); err != nil {
+	// 			return nil, err
+	// 		}
 
-			publicKeySig = base64.StdEncoding.EncodeToString(signedBytes)
+	// 		publicKeySig = base64.StdEncoding.EncodeToString(signedBytes)
 
-		case *ecdsa.PrivateKey:
-			var pubKeyBytes []byte
-			var err error
+	// 	case *ecdsa.PrivateKey:
+	// 		var pubKeyBytes []byte
+	// 		var err error
 
-			if pubKeyBytes, publicKey, err = publicKeyBytesAndString(&k.PublicKey); err != nil {
-				return nil, err
-			}
+	// 		if pubKeyBytes, publicKey, err = publicKeyBytesAndString(&k.PublicKey); err != nil {
+	// 			return nil, err
+	// 		}
 
-			var h = sha256.Sum256(pubKeyBytes)
+	// 		var h = sha256.Sum256(pubKeyBytes)
 
-			var r, s *big.Int
-			if r, s, err = ecdsa.Sign(rand.Reader, k, h[:]); err != nil {
-				return nil, err
-			}
+	// 		var r, s *big.Int
+	// 		if r, s, err = ecdsa.Sign(rand.Reader, k, h[:]); err != nil {
+	// 			return nil, err
+	// 		}
 
-			var signedBytes []byte
-			if signedBytes, err = asn1.Marshal([]*big.Int{r, s}); err != nil {
-				return nil, err
-			}
+	// 		var signedBytes []byte
+	// 		if signedBytes, err = asn1.Marshal([]*big.Int{r, s}); err != nil {
+	// 			return nil, err
+	// 		}
 
-			publicKeySig = base64.StdEncoding.EncodeToString(signedBytes)
+	// 		publicKeySig = base64.StdEncoding.EncodeToString(signedBytes)
 
-		default:
-			return nil, fmt.Errorf("unsupported private key type: %T", k)
-		}
+	// 	default:
+	// 		return nil, fmt.Errorf("unsupported private key type: %T", k)
+	// 	}
 
-	case r.CSR != nil:
-		publicKey = pki.CSRToPEMString(r.CSR)
+	// case r.CSR != nil:
+	// 	publicKey = pki.CSRToPEMString(r.CSR)
 
-		// Remove trailing newline from string, if present.
-		if publicKey[len(publicKey)-1] == '\n' {
-			publicKey = publicKey[:len(publicKey)-1]
-		}
+	// 	// Remove trailing newline from string, if present.
+	// 	if publicKey[len(publicKey)-1] == '\n' {
+	// 		publicKey = publicKey[:len(publicKey)-1]
+	// 	}
 
-	}
+	// }
 
 	return json.Marshal(jsonRequest{
 		Validity:            r.Validity,
@@ -393,8 +388,9 @@ func (r Request) MarshalJSON() ([]byte, error) {
 		MSExtension:         r.MSExtension,
 		CustomExtensions:    raw,
 		Signature:           r.Signature,
-		PublicKey:           publicKey,
-		PublicKeySignature:  publicKeySig,
+		// PublicKey:           publicKey,
+		// PublicKeySignature:  publicKeySig,
+		PublicKey: r.PublicKey,
 	})
 }
 
