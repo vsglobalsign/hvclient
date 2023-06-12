@@ -69,7 +69,7 @@ type Request struct {
 	MSExtension         *MSExtension
 	CustomExtensions    []OIDAndString
 	CSR                 *x509.CertificateRequest
-	SignaturePolicy     *SignaturePolicy
+	Signature           *Signature
 	PrivateKey          interface{}
 	PublicKey           interface{}
 }
@@ -155,6 +155,12 @@ type MSExtension struct {
 	MinorVersion int
 }
 
+// Signature is the signature field in Request.
+type Signature struct {
+	Algorithm     string `json:"algorithm"`
+	HashAlgorithm string `json:"hash_algorithm"`
+}
+
 // jsonRequest is used internally for JSON marshalling/unmarshalling.
 type jsonRequest struct {
 	Validity            *Validity            `json:"validity,omitempty"`
@@ -165,7 +171,7 @@ type jsonRequest struct {
 	QualifiedStatements *QualifiedStatements `json:"qualified_statements,omitempty"`
 	MSExtension         *MSExtension         `json:"ms_extension_template,omitempty"`
 	CustomExtensions    json.RawMessage      `json:"custom_extensions,omitempty"`
-	SignaturePolicy     *SignaturePolicy     `json:"signature,omitempty"`
+	Signature           *Signature           `json:"signature,omitempty"`
 	PublicKey           string               `json:"public_key,omitempty"`
 	PublicKeySignature  string               `json:"public_key_signature,omitempty"`
 }
@@ -386,7 +392,7 @@ func (r Request) MarshalJSON() ([]byte, error) {
 		QualifiedStatements: r.QualifiedStatements,
 		MSExtension:         r.MSExtension,
 		CustomExtensions:    raw,
-		SignaturePolicy:     r.SignaturePolicy,
+		Signature:           r.Signature,
 		PublicKey:           publicKey,
 		PublicKeySignature:  publicKeySig,
 	})
@@ -451,7 +457,7 @@ func (r *Request) UnmarshalJSON(b []byte) error {
 		QualifiedStatements: jsonreq.QualifiedStatements,
 		MSExtension:         jsonreq.MSExtension,
 		CustomExtensions:    exts,
-		SignaturePolicy:     jsonreq.SignaturePolicy,
+		Signature:           jsonreq.Signature,
 	}
 
 	return nil
