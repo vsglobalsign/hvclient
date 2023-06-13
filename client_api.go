@@ -122,7 +122,7 @@ const (
 func (c *Client) CertificateRequest(
 	ctx context.Context,
 	req *Request,
-) (*big.Int, error) {
+) (*string, error) {
 
 	var r, err = c.makeRequest(
 		ctx,
@@ -136,19 +136,12 @@ func (c *Client) CertificateRequest(
 	}
 
 	var snString string
-	snString, err = basePathHeaderFromResponse(r, certSNHeaderName)
+	snString, err = headerFromResponse(r, certSNHeaderName)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("Location Header value is ", snString)
-
-	var sn, ok = big.NewInt(0).SetString(snString, 16)
-	if !ok {
-		return nil, fmt.Errorf("invalid serial number returned: %s", snString)
-	}
-
-	return sn, nil
+	return &snString, nil
 }
 
 // CertificateRetrieve retrieves a certificate.

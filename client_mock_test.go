@@ -142,7 +142,7 @@ func TestClientMockCertificatesRequest(t *testing.T) {
 				t.Fatalf("failed to read CSR: %v", err)
 			}
 
-			var got *big.Int
+			var got *string
 			got, err = client.CertificateRequest(
 				ctx,
 				&hvclient.Request{
