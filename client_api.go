@@ -141,6 +141,8 @@ func (c *Client) CertificateRequest(
 		return nil, err
 	}
 
+	fmt.Println("Location Header value is ", snString)
+
 	var sn, ok = big.NewInt(0).SetString(snString, 16)
 	if !ok {
 		return nil, fmt.Errorf("invalid serial number returned: %s", snString)
