@@ -165,11 +165,15 @@ func (c *Client) CertificateRetrieve(
 }
 
 // CertificateRevoke revokes a certificate.
+const (
+	emptyKey = ""
+)
+
 func (c *Client) CertificateRevoke(
 	ctx context.Context,
 	serial *big.Int,
 ) error {
-	return c.CertificateRevokeWithReason(ctx, serial, RevocationReasonUnspecified, 0)
+	return c.CertificateRevokeWithReason(ctx, serial, RevocationReasonUnspecified, 0, emptyKey)
 }
 
 // CertificateRevokeWithReason revokes a certificate with a specified reason
@@ -181,15 +185,21 @@ func (c *Client) CertificateRevokeWithReason(
 	serial *big.Int,
 	reason RevocationReason,
 	time int64,
+	keyCompromiseAttestation string,
 ) error {
 	type certificatePatch struct {
-		RevocationReason RevocationReason `json:"revocation_reason"`
-		RevocationTime   int64            `json:"revocation_time,omitempty"`
+		RevocationReason         RevocationReason `json:"revocation_reason"`
+		RevocationTime           int64            `json:"revocation_time,omitempty"`
+		KeyCompromiseAttestation string           `json:"key_compromise_attestation,omitempty"`
 	}
 
 	var patch = certificatePatch{
 		RevocationReason: reason,
 		RevocationTime:   time,
+	}
+
+	if keyCompromiseAttestation != "" {
+		patch.KeyCompromiseAttestation = keyCompromiseAttestation
 	}
 
 	var _, err = c.makeRequest(
