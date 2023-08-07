@@ -197,19 +197,11 @@ func (c *Client) CertificateRevokeWithReason(
 		RevocationReason: reason,
 	}
 
-	// To be removed
-	fmt.Println("Key compromise attestation is ", keyCompromiseAttestation)
-
 	if keyCompromiseAttestation != "" {
-		// To be removed
-		fmt.Println("If condition satisfied")
 
 		patch.KeyCompromiseAttestation = keyCompromiseAttestation
 		patch.RevocationTime = time
 	}
-
-	//  To be removed
-	fmt.Println("Payload is ", patch)
 
 	var _, err = c.makeRequest(
 		ctx,

@@ -65,8 +65,7 @@ type Request struct {
 	CSR                 *x509.CertificateRequest
 	Signature           *Signature
 	PrivateKey          interface{}
-	// PublicKey           interface{}
-	PublicKey string
+	PublicKey           string
 }
 
 // Validity contains the requested not-before and not-after times for a
