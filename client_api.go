@@ -195,11 +195,11 @@ func (c *Client) CertificateRevokeWithReason(
 
 	var patch = certificatePatch{
 		RevocationReason: reason,
-		RevocationTime:   time,
 	}
 
 	if keyCompromiseAttestation != "" {
 		patch.KeyCompromiseAttestation = keyCompromiseAttestation
+		patch.RevocationTime = time
 	}
 
 	var _, err = c.makeRequest(
